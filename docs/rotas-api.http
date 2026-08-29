@@ -1,0 +1,135 @@
+### =====================================================================
+### Sistema de Almoxarifado - Mapeamento de Rotas da API
+### Base URL local
+### =====================================================================
+@baseUrl = http://localhost:3001/api
+
+
+### =====================================================================
+### ALUNOS
+### =====================================================================
+
+### Listar todos os alunos
+GET {{baseUrl}}/alunos
+
+### Buscar um aluno pelo ID
+GET {{baseUrl}}/alunos/1
+
+### Cadastrar um novo aluno
+POST {{baseUrl}}/alunos
+Content-Type: application/json
+
+{
+  "nome": "Maria Clara Ribeiro",
+  "matricula": "2024005",
+  "email": "maria.ribeiro@escola.edu.br",
+  "turma": "1ºA - Informática"
+}
+
+### Atualizar dados de um aluno
+PUT {{baseUrl}}/alunos/1
+Content-Type: application/json
+
+{
+  "nome": "Maria Clara Ribeiro Santos",
+  "matricula": "2024005",
+  "email": "maria.ribeiro@escola.edu.br",
+  "turma": "1ºA - Informática"
+}
+
+### Excluir um aluno (só permitido se não houver empréstimos vinculados)
+DELETE {{baseUrl}}/alunos/1
+
+
+### =====================================================================
+### EQUIPAMENTOS
+### =====================================================================
+
+### Listar todos os equipamentos do catálogo
+GET {{baseUrl}}/equipamentos
+
+### Listar apenas equipamentos DISPONÍVEIS
+### (usado pelo front-end para popular o formulário de empréstimo)
+GET {{baseUrl}}/equipamentos?status=disponivel
+
+### Buscar um equipamento pelo ID
+GET {{baseUrl}}/equipamentos/1
+
+### Cadastrar um novo equipamento no catálogo
+POST {{baseUrl}}/equipamentos
+Content-Type: application/json
+
+{
+  "nome": "Notebook Acer Aspire 5",
+  "numero_patrimonio": "PAT-0030",
+  "categoria": "Notebook",
+  "observacoes": "Acompanha carregador"
+}
+
+### Atualizar dados de um equipamento (nome, categoria, status manual - ex: enviar p/ manutenção)
+PUT {{baseUrl}}/equipamentos/1
+Content-Type: application/json
+
+{
+  "nome": "Notebook Dell Latitude 3420",
+  "numero_patrimonio": "PAT-0001",
+  "categoria": "Notebook",
+  "status": "manutencao",
+  "observacoes": "Tela com defeito, enviado para conserto"
+}
+
+### Excluir um equipamento (só permitido se não houver empréstimos vinculados)
+DELETE {{baseUrl}}/equipamentos/1
+
+
+### =====================================================================
+### EMPRÉSTIMOS
+### =====================================================================
+
+### Listar todo o histórico de empréstimos (ativos + devolvidos)
+GET {{baseUrl}}/emprestimos
+
+### Listar apenas empréstimos ATIVOS (equipamento ainda não devolvido)
+GET {{baseUrl}}/emprestimos?status=ativo
+
+### Listar apenas empréstimos EM ATRASO
+### (status ativo E data_limite_devolucao < hoje)
+GET {{baseUrl}}/emprestimos/atrasados
+
+### Buscar um empréstimo específico pelo ID (com dados do aluno e equipamento)
+GET {{baseUrl}}/emprestimos/1
+
+### Registrar um novo empréstimo (saída de equipamento)
+### Regra crítica: a API rejeita (400) se o equipamento não estiver "disponivel"
+POST {{baseUrl}}/emprestimos
+Content-Type: application/json
+
+{
+  "aluno_id": 2,
+  "equipamento_id": 5,
+  "data_limite_devolucao": "2026-09-10",
+  "observacoes": "Uso no projeto de robótica da feira de ciências"
+}
+
+### Registrar a devolução de um empréstimo
+### Define data_devolucao = agora, status = 'devolvido'
+### e volta o status do equipamento para 'disponivel'
+PUT {{baseUrl}}/emprestimos/1/devolucao
+Content-Type: application/json
+
+{
+  "observacoes": "Devolvido em bom estado"
+}
+
+
+### =====================================================================
+### DASHBOARD
+### =====================================================================
+
+### Resumo geral para o painel inicial
+### (totais de equipamentos por status, alunos cadastrados,
+###  empréstimos ativos e quantidade em atraso)
+GET {{baseUrl}}/dashboard/resumo
+
+### Lista de empréstimos em atraso para destaque no painel
+GET {{baseUrl}}/dashboard/atrasados
